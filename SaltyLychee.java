@@ -1,28 +1,13 @@
-/**
-* Salty Lychee: a simple password hashing library
-* 
-* @author	StellaContrail
-* 
-* Copyright (c) 2022, StellaContrail
-*
-* This library is released under the MIT License.
-* See https://opensource.org/licenses/mit-license.php for more details.
-*/
-
-package utility;
-
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Random;
+import java.security.SecureRandom;
 import java.util.regex.Pattern;
-
-import javax.xml.bind.DatatypeConverter;
 
 public class SaltyLychee {
     private static final String ALGORITHM = "SHA-256";
     private static final int STRETCHING_COUNT = 10;
     private static final String SEPARATOR = "$";
-    private static final Random RAND = new Random();
+    private static final SecureRandom RAND = new SecureRandom();
 
     public static String hash(String passStr) throws NoSuchAlgorithmException {
         return hash(passStr, genRandStr());
@@ -38,7 +23,12 @@ public class SaltyLychee {
             passHash = md.digest(passHash);
         }
         
-        return salt + SEPARATOR + DatatypeConverter.printHexBinary(passHash).toLowerCase();
+        StringBuilder sb = new StringBuilder(passHash.length * 2);
+        for (byte b : passHash) {
+            sb.append(String.format("%02x", b));
+        }
+
+        return salt + SEPARATOR + sb.toString();
     }
     
     private static String genRandStr() {
